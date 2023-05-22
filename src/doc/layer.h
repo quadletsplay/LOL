@@ -14,6 +14,7 @@
 #include "doc/frame.h"
 #include "doc/layer_list.h"
 #include "doc/object.h"
+#include "doc/with_flags.h"
 #include "doc/with_user_data.h"
 
 #include <string>
@@ -51,7 +52,8 @@ namespace doc {
     StructuralFlagsMask = Background | Reference,
   };
 
-  class Layer : public WithUserData {
+  class Layer : public WithUserData
+              , public WithFlags<LayerFlags> {
   protected:
     Layer(ObjectType type, Sprite* sprite);
 
@@ -106,25 +108,6 @@ namespace doc {
     void setCollapsed (bool state) { switchFlags(LayerFlags::Collapsed, state); }
     void setReference (bool state) { switchFlags(LayerFlags::Reference, state); }
 
-    LayerFlags flags() const {
-      return m_flags;
-    }
-
-    bool hasFlags(LayerFlags flags) const {
-      return (int(m_flags) & int(flags)) == int(flags);
-    }
-
-    void setFlags(LayerFlags flags) {
-      m_flags = flags;
-    }
-
-    void switchFlags(LayerFlags flags, bool state) {
-      if (state)
-        m_flags = LayerFlags(int(m_flags) | int(flags));
-      else
-        m_flags = LayerFlags(int(m_flags) & ~int(flags));
-    }
-
     BlendMode blendMode() const { return m_blendmode; }
     void setBlendMode(BlendMode blendmode) { m_blendmode = blendmode; }
 
@@ -140,11 +123,10 @@ namespace doc {
     std::string m_name;           // layer name
     Sprite* m_sprite;             // owner of the layer
     LayerGroup* m_parent;        // parent layer
-    LayerFlags m_flags;           // stack order cannot be changed
 
     BlendMode m_blendmode;
     int m_opacity;
-  
+
     // Disable assigment
     Layer& operator=(const Layer& other);
   };
@@ -183,7 +165,7 @@ namespace doc {
 
   private:
     void destroyAllCels();
-  
+
     CelList m_cels;   // List of all cels inside this layer used by frames.
   };
 
