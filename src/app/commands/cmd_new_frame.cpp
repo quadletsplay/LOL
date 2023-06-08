@@ -131,7 +131,7 @@ void NewFrameCommand::onExecute(Context* context)
           auto timeline = App::instance()->timeline();
           timeline->prepareToMoveRange();
 #endif
-          DocRange range = site.range();
+          view::RealRange range = site.range();
 
           SelectedLayers selLayers;
           if (site.inFrames())
