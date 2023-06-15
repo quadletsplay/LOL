@@ -87,6 +87,7 @@ namespace app {
       STATE_MOVING_TAG,
       STATE_RESIZING_TAG_LEFT,
       STATE_RESIZING_TAG_RIGHT,
+      STATE_RESIZING_FRAMES,
       // Changing layers flags states
       STATE_SHOWING_LAYERS,
       STATE_HIDING_LAYERS,
@@ -200,6 +201,8 @@ namespace app {
       int part;
       layer_t layer;
       frame_t frame;
+      double timePos;
+      int x;
       ObjectId tag;
       bool veryBottom;
       int band;
@@ -236,6 +239,23 @@ namespace app {
       HHit hhit;
       VHit vhit;
       bool outside;
+    };
+
+    struct Col {
+      Col() { m_duration = m_x = m_width = 0; }
+      Col(const int duration,
+          const int x,
+          const int width)
+        : m_duration(duration)
+        , m_x(x)
+        , m_width(width) { }
+      int duration() const { return m_duration; }
+      int x() const { return m_x; }
+      int x2() const { return m_x + m_width; }
+      int width() const { return m_width; }
+    private:
+      int m_duration;
+      int m_x, m_width;
     };
 
     struct Row {
@@ -305,10 +325,14 @@ namespace app {
     gfx::Rect getPartBounds(const Hit& hit) const;
     gfx::Rect getRangeBounds(const Range& range) const;
     gfx::Rect getRangeClipBounds(const Range& range) const;
+    int getFrameXPos(const frame_t frame) const;
+    int getFrameWidth(const frame_t frame) const;
+    frame_t getFrameInXPos(const int x) const;
     void invalidateHit(const Hit& hit);
     void invalidateLayer(const Layer* layer);
     void invalidateFrame(const frame_t frame);
     void invalidateRange();
+    void regenerateCols();
     void regenerateRows();
     void regenerateTagBands();
     int visibleTagBands() const;
@@ -359,7 +383,7 @@ namespace app {
     int frameBoxWidth() const;
     int outlineWidth() const;
     int oneTagHeight() const;
-    int calcTagVisibleToFrame(Tag* tag) const;
+    frame_t calcTagVisibleToFrame(Tag* tag) const;
 
     void updateCelOverlayBounds(const Hit& hit);
     void drawCelOverlay(ui::Graphics* g);
@@ -369,9 +393,10 @@ namespace app {
                           const bool updatePref);
 
     double zoom() const;
+    int totalAnimationDuration() const;
     int tagFramesDuration(const Tag* tag) const;
     // Calculate the duration of the selected range of frames
-    int selectedFramesDuration() const;
+    int selectedFramesDuration(const bool originalDuration) const;
 
     void setLayerVisibleFlag(const layer_t layer, const bool state);
     void setLayerEditableFlag(const layer_t layer, const bool state);
@@ -383,16 +408,24 @@ namespace app {
 
     static gfx::Color highlightColor(const gfx::Color color);
 
+    void scaleSelectedFrames(const double scale);
+
+    bool variableStep() const;
+    bool timeBased() const; // Returns true if the user prefer a time-based timeline.
+
     ui::ScrollBar m_hbar;
     ui::ScrollBar m_vbar;
     gfx::Rect m_viewportArea;
     double m_zoom;
+    double m_timeZoom;
     Context* m_context;
     Editor* m_editor;
     Doc* m_document;
     Sprite* m_sprite;
     Layer* m_layer;
     frame_t m_frame;
+    double m_timePos; // Exact time position for a time-based timeline.
+    double m_activeRangeScale;  // Used to resize frames on variable-step timeline.
     int m_rangeLocks;
     Range m_range;
     Range m_startRange;
@@ -404,6 +437,9 @@ namespace app {
     // regenerating all rows if it's not necessary.
     doc::ObjectVersion m_savedVersion;
 
+    // Data used to display each column in the timeline
+    std::vector<Col> m_cols;
+
     // Data used to display each row in the timeline
     std::vector<Row> m_rows;
 
@@ -414,8 +450,8 @@ namespace app {
 
     int m_separator_x;
     int m_separator_w;
-    int m_origFrames;
-    Hit m_hot;       // The 'hot' part is where the mouse is on top of
+    int m_origFrames; // Used to move onion skin range
+    Hit m_hot;        // The 'hot' part is where the mouse is on top of
     DropTarget m_dropTarget;
     Hit m_clk; // The 'clk' part is where the mouse's button was pressed (maybe for a drag & drop operation)
     // Absolute mouse positions for scrolling.
