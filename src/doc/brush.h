@@ -1,5 +1,5 @@
 // Aseprite Document Library
-// Copyright (C) 2019-2022  Igara Studio S.A.
+// Copyright (C) 2019-2023  Igara Studio S.A.
 // Copyright (C) 2001-2018  David Capello
 //
 // This file is released under the terms of the MIT license.
@@ -79,6 +79,10 @@ namespace doc {
         return m_image.get();
     }
 
+    void resetSymmetries();
+    Image* getSymmetryImage(const int index);
+    Image* getSymmetryMask(const int index);
+
   private:
     void clean();
     void regenerate();
@@ -95,6 +99,10 @@ namespace doc {
     gfx::Point m_patternOrigin;           // From what position the brush was taken
     ImageRef m_patternImage;
     int m_gen;
+
+    //Symmetry image/mask buffers
+    std::vector<ImageRef> m_symmetryImages;
+    std::vector<ImageRef> m_symmetryMasks;
 
     // Extra data used for setImageColor()
     ImageRef m_backupImage; // Backup image to avoid losing original brush colors/pattern
