@@ -1,5 +1,5 @@
 // Aseprite
-// Copyright (C) 2018-2022  Igara Studio S.A.
+// Copyright (C) 2018-2023  Igara Studio S.A.
 // Copyright (C) 2001-2018  David Capello
 //
 // This program is distributed under the terms of
@@ -31,9 +31,10 @@ public:
     m_proc->processScanline(x1, y, x2, loop);
   }
 
-  void prepareForPointShape(ToolLoop* loop, bool firstPoint, int x, int y) override {
+  void prepareForPointShape(ToolLoop* loop, bool firstPoint, int x, int y,
+                            gen::SymmetryMode symmetry) override {
     ASSERT(m_proc);
-    m_proc->prepareForPointShape(loop, firstPoint, x, y);
+    m_proc->prepareForPointShape(loop, firstPoint, x, y, symmetry);
   }
 
   void prepareVForPointShape(ToolLoop* loop, int y) override {
@@ -516,7 +517,7 @@ public:
       m_mask.unfreeze();
 
       loop->setMask(&m_mask);
-      double cornerThick = (loop->isTilemapMode()) ? 
+      double cornerThick = (loop->isTilemapMode()) ?
                               CORNER_THICK_FOR_TILEMAP_MODE :
                               CORNER_THICK_FOR_PIXELS_MODE;
       loop->getDocument()->setTransformation(
