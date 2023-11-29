@@ -328,12 +328,14 @@ void ToolLoopManager::calculateDirtyArea(const Strokes& strokes)
     m_toolLoop->getPointShape()->getModifiedArea(
       m_toolLoop,
       strokeBounds.x,
-      strokeBounds.y, r1);
+      strokeBounds.y,
+      stroke.firstPoint().symmetry, r1);
 
     m_toolLoop->getPointShape()->getModifiedArea(
       m_toolLoop,
       strokeBounds.x+strokeBounds.w-1,
-      strokeBounds.y+strokeBounds.h-1, r2);
+      strokeBounds.y+strokeBounds.h-1,
+      stroke.firstPoint().symmetry, r2);
 
     m_dirtyArea.createUnion(m_dirtyArea, Region(r1.createUnion(r2)));
   }

@@ -1,5 +1,5 @@
 // Aseprite
-// Copyright (C) 2018-2020  Igara Studio S.A.
+// Copyright (C) 2018-2023  Igara Studio S.A.
 // Copyright (C) 2001-2017  David Capello
 //
 // This program is distributed under the terms of
@@ -101,7 +101,8 @@ namespace app {
       virtual void prepareForStrokes(ToolLoop* loop, Strokes& strokes) { }
 
       // Called for each point shape.
-      virtual void prepareForPointShape(ToolLoop* loop, bool firstPoint, int x, int y) { }
+      virtual void prepareForPointShape(ToolLoop* loop, bool firstPoint, int x, int y,
+                                        gen::SymmetryMode summetry) { }
       virtual void prepareVForPointShape(ToolLoop* loop, int y) { }
       virtual void prepareUForPointShapeWholeScanline(ToolLoop* loop, int x1) { }
       virtual void prepareUForPointShapeSlicedScanline(ToolLoop* loop, bool leftSlice, int x1) { }
