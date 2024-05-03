@@ -97,16 +97,18 @@ TEST(Grid, MakeAlignedMask)
   mask.add(gfx::Rect(8, 4, 1, 1));
   mask.add(gfx::Rect(7, 7, 1, 1));
   auto gridAlignedMask3 = make_aligned_mask(&grid, &mask);
+  const bool _ = false;
+  const bool X = true;
   bool expected[8*8] = {
-     1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,
+     X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,
 
-     0, 0, 0, 0,  1, 1, 1, 1,
-     0, 0, 0, 0,  1, 1, 1, 1,
-     0, 0, 0, 0,  1, 1, 1, 1,
-     0, 0, 0, 0,  1, 1, 1, 1,
+     _, _, _, _,  X, X, X, X,
+     _, _, _, _,  X, X, X, X,
+     _, _, _, _,  X, X, X, X,
+     _, _, _, _,  X, X, X, X,
   };
   int c=0;
   for (int j=0; j<8; ++j)
@@ -119,15 +121,15 @@ TEST(Grid, MakeAlignedMask)
   mask.add(gfx::Rect(9, 1, 1, 1));
   auto gridAlignedMask4 = make_aligned_mask(&grid, &mask);
   bool expected2[12*8] = {
-     1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,
+     X, X, X, X,  X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,  X, X, X, X,
 
-     0, 0, 0, 0,  1, 1, 1, 1,  0, 0, 0, 0,
-     0, 0, 0, 0,  1, 1, 1, 1,  0, 0, 0, 0,
-     0, 0, 0, 0,  1, 1, 1, 1,  0, 0, 0, 0,
-     0, 0, 0, 0,  1, 1, 1, 1,  0, 0, 0, 0,
+     _, _, _, _,  X, X, X, X,  _, _, _, _,
+     _, _, _, _,  X, X, X, X,  _, _, _, _,
+     _, _, _, _,  X, X, X, X,  _, _, _, _,
+     _, _, _, _,  X, X, X, X,  _, _, _, _,
   };
   c=0;
   for (int j=0; j<8; ++j)
@@ -137,15 +139,15 @@ TEST(Grid, MakeAlignedMask)
   grid.origin(gfx::Point(2,1));
   auto gridAlignedMask5 = make_aligned_mask(&grid, &mask);
   bool expected3[8*8] = {
-     1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,
-     1, 1, 1, 1,  1, 1, 1, 1,
+     X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,
+     X, X, X, X,  X, X, X, X,
 
-     1, 1, 1, 1,  0, 0, 0, 0,
-     1, 1, 1, 1,  0, 0, 0, 0,
-     1, 1, 1, 1,  0, 0, 0, 0,
-     1, 1, 1, 1,  0, 0, 0, 0,
+     X, X, X, X,  _, _, _, _,
+     X, X, X, X,  _, _, _, _,
+     X, X, X, X,  _, _, _, _,
+     X, X, X, X,  _, _, _, _,
   };
   c=0;
   for (int j=0; j<8; ++j)
