@@ -1671,8 +1671,6 @@ public:
     m_combobox.setExpansive(true);
     m_combobox.setMinSize(gfx::Size(256*guiscale(), 0));
 
-    if (auto* editor = Editor::activeEditor())
-      m_transform.setSelected(editor->slicesTransforms());
     m_transform.Click.connect(
       [this]() {
         if (auto* editor = Editor::activeEditor())
@@ -1800,6 +1798,9 @@ private:
     m_combobox.setVisible(visible);
     m_transform.setVisible(visible);
     m_action.setVisible(visible);
+
+    if (auto* editor = Editor::activeEditor())
+      m_transform.setSelected(editor->slicesTransforms());
 
     if (relayout)
       parent()->layout();
