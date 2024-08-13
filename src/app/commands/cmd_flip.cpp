@@ -31,7 +31,6 @@
 #include "app/ui/timeline/timeline.h"
 #include "app/ui/toolbar.h"
 #include "app/util/expand_cel_canvas.h"
-#include "app/util/range_utils.h"
 #include "doc/algorithm/flip_image.h"
 #include "doc/cel.h"
 #include "doc/cels_range.h"
@@ -40,7 +39,6 @@
 #include "doc/mask.h"
 #include "doc/sprite.h"
 #include "gfx/size.h"
-
 
 namespace app {
 
@@ -90,16 +88,7 @@ void FlipCommand::onExecute(Context* ctx)
     }
 #endif
 
-    auto range = site.range();
-    if (range.enabled()) {
-      cels = get_unique_cels_to_edit_pixels(site.sprite(), range);
-    }
-    else if (site.cel() &&
-             site.layer() &&
-             site.layer()->canEditPixels()) {
-      cels.push_back(site.cel());
-    }
-
+    cels = site.selectedUniqueCelsToEditPixels();
     if (cels.empty()) {
 #ifdef ENABLE_UI
       if (ctx->isUIAvailable()) {
@@ -112,8 +101,7 @@ void FlipCommand::onExecute(Context* ctx)
   }
   // Flip the whole sprite (even locked layers)
   else {
-    for (Cel* cel : site.sprite()->uniqueCels())
-      cels.push_back(cel);
+    cels = site.sprite()->uniqueCels().toList();
   }
 
   ContextWriter writer(ctx);
@@ -124,7 +112,7 @@ void FlipCommand::onExecute(Context* ctx)
 
   Mask* mask = document->mask();
   if (m_flipMask && document->isMaskVisible()) {
-    Site site = *writer.site();
+    Site site = writer.site();
 
     for (Cel* cel : cels) {
       // TODO add support to flip masked part of a reference layer
