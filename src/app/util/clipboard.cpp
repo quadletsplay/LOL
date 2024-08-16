@@ -273,7 +273,7 @@ bool Clipboard::copyFromDocument(const Site& site, bool merged)
       (mask ? new Mask(*mask): nullptr),
       (pal ? new Palette(*pal): nullptr),
       Tileset::MakeCopyCopyingImages(ts),
-      true,                       // set native clipboard
+      App::instance()->isGui(),   // set native clipboard
       site.layer() && !site.layer()->isBackground());
 
     return true;
@@ -290,7 +290,7 @@ bool Clipboard::copyFromDocument(const Site& site, bool merged)
     (mask ? new Mask(*mask): nullptr),
     (pal ? new Palette(*pal): nullptr),
     nullptr,
-    true,                       // set native clipboard
+    App::instance()->isGui(),     // set native clipboard
     site.layer() && !site.layer()->isBackground());
 
   return true;
@@ -379,6 +379,8 @@ void Clipboard::cut(ContextWriter& writer)
       tx.commit();
     }
     writer.document()->generateMaskBoundaries();
+    if (!writer.context()->isUIAvailable())
+      return;
 #ifdef ENABLE_UI
     update_screen_for_document(writer.document());
 #endif
@@ -412,6 +414,8 @@ void Clipboard::copyRange(const ContextReader& reader, const DocRange& range)
   clearContent();
   m_data->range.setRange(writer.document(), range);
 
+  if (!App::instance()->isGui())
+    return;
 #ifdef ENABLE_UI
   // TODO Replace this with a signal, because here the timeline
   // depends on the clipboard and the clipboard on the timeline.
@@ -429,7 +433,7 @@ void Clipboard::copyImage(const Image* image,
     (mask ? new Mask(*mask): nullptr),
     (pal ? new Palette(*pal): nullptr),
     nullptr,
-    true, false);
+    App::instance()->isGui(), false);
 }
 
 void Clipboard::copyTilemap(const Image* image,
