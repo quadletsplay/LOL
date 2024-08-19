@@ -8,7 +8,7 @@
 #include "config.h"
 #endif
 
-#if SK_ENABLE_SKSL
+#if LAF_SKIA
 
 #include "app/util/shader_helpers.h"
 
@@ -16,10 +16,13 @@
 #include "doc/image.h"
 #include "fmt/format.h"
 
-#include "include/effects/SkRuntimeEffect.h"
-#include "src/core/SkRuntimeEffectPriv.h"
+#if SK_ENABLE_SKSL
+  #include "src/core/SkRuntimeEffectPriv.h"
+#endif
 
 namespace app {
+
+#if SK_ENABLE_SKSL
 
 sk_sp<SkRuntimeEffect> make_shader(const char* code)
 {
@@ -39,6 +42,8 @@ sk_sp<SkRuntimeEffect> make_shader(const char* code)
   }
   return result.effect;
 }
+
+#endif // SK_ENABLE_SKSL
 
 SkImageInfo get_skimageinfo_for_docimage(const doc::Image* img)
 {
@@ -98,4 +103,4 @@ std::unique_ptr<SkCanvas> make_skcanvas_for_docimage(const doc::Image* img)
 
 } // namespace app
 
-#endif // SK_ENABLE_SKSL
+#endif // LAF_SKIA
