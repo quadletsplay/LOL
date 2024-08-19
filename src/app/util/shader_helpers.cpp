@@ -15,6 +15,7 @@
 #include "base/exception.h"
 #include "doc/image.h"
 #include "fmt/format.h"
+#include "os/skia/skia_surface.h"
 
 #if SK_ENABLE_SKSL
   #include "src/core/SkRuntimeEffectPriv.h"
@@ -99,6 +100,19 @@ std::unique_ptr<SkCanvas> make_skcanvas_for_docimage(const doc::Image* img)
     get_skimageinfo_for_docimage(img),
     (void*)img->getPixelAddress(0, 0),
     img->rowBytes());
+}
+
+sk_sp<SkSurface> make_sksurface_for_docimage(const doc::Image* img)
+{
+  return SkSurfaces::WrapPixels(
+      get_skimageinfo_for_docimage(img),
+      (void*)img->getPixelAddress(0, 0),
+      img->rowBytes());
+}
+
+os::SurfaceRef make_surface_for_docimage(const doc::Image* img)
+{
+  return os::SurfaceRef(new os::SkiaSurface(make_sksurface_for_docimage(img)));
 }
 
 } // namespace app

@@ -20,12 +20,14 @@
 #include "app/script/blend_mode.h"
 #include "app/script/docobj.h"
 #include "app/script/engine.h"
+#include "app/script/graphics_context.h"
 #include "app/script/luacpp.h"
 #include "app/script/security.h"
 #include "app/site.h"
 #include "app/tx.h"
 #include "app/util/autocrop.h"
 #include "app/util/resize_image.h"
+#include "app/util/shader_helpers.h"
 #include "base/fs.h"
 #include "doc/algorithm/flip_image.h"
 #include "doc/algorithm/flip_type.h"
@@ -37,6 +39,7 @@
 #include "doc/primitives.h"
 #include "doc/sprite.h"
 #include "render/render.h"
+#include "ui/scale.h"
 
 #include <algorithm>
 #include <cstring>
@@ -54,6 +57,8 @@ struct ImageObj {
   doc::ObjectId celId = 0;
   doc::ObjectId tilesetId = 0;
   doc::tile_index ti = 0;
+  std::unique_ptr<GraphicsContext> context = nullptr;
+
   ImageObj(doc::Image* image)
     : imageId(image->id()) {
   }
@@ -742,6 +747,19 @@ int Image_get_cel(lua_State* L)
   return 1;
 }
 
+int Image_get_context(lua_State* L)
+{
+  auto* obj = get_obj<ImageObj>(L, 1);
+
+  if (!obj->context) {
+    auto surface = make_surface_for_docimage(obj->image(L));
+    obj->context = std::make_unique<GraphicsContext>(surface, ui::guiscale());
+  }
+
+  push_obj(L, *obj->context);
+  return 1;
+}
+
 const luaL_Reg Image_methods[] = {
   { "clone", Image_clone },
   { "clear", Image_clear },
@@ -774,6 +792,7 @@ const Property Image_properties[] = {
   { "colorMode", Image_get_colorMode, nullptr },
   { "spec", Image_get_spec, nullptr },
   { "cel", Image_get_cel, nullptr },
+  { "context", Image_get_context, nullptr },
   { nullptr, nullptr, nullptr }
 };
 
