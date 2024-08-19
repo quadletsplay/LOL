@@ -8,18 +8,22 @@
 #include "config.h"
 #endif
 
-#if SK_ENABLE_SKSL
+#if LAF_SKIA
 
 #include "app/util/shader_helpers.h"
 
 #include "base/exception.h"
 #include "doc/image.h"
 #include "fmt/format.h"
+#include "os/skia/skia_surface.h"
 
-#include "include/effects/SkRuntimeEffect.h"
-#include "src/core/SkRuntimeEffectPriv.h"
+#if SK_ENABLE_SKSL
+  #include "src/core/SkRuntimeEffectPriv.h"
+#endif
 
 namespace app {
+
+#if SK_ENABLE_SKSL
 
 sk_sp<SkRuntimeEffect> make_shader(const char* code)
 {
@@ -39,6 +43,8 @@ sk_sp<SkRuntimeEffect> make_shader(const char* code)
   }
   return result.effect;
 }
+
+#endif // SK_ENABLE_SKSL
 
 SkImageInfo get_skimageinfo_for_docimage(const doc::Image* img)
 {
@@ -96,6 +102,19 @@ std::unique_ptr<SkCanvas> make_skcanvas_for_docimage(const doc::Image* img)
     img->rowBytes());
 }
 
+sk_sp<SkSurface> make_sksurface_for_docimage(const doc::Image* img)
+{
+  return SkSurfaces::WrapPixels(
+      get_skimageinfo_for_docimage(img),
+      (void*)img->getPixelAddress(0, 0),
+      img->rowBytes());
+}
+
+os::SurfaceRef make_surface_for_docimage(const doc::Image* img)
+{
+  return os::SurfaceRef(new os::SkiaSurface(make_sksurface_for_docimage(img)));
+}
+
 } // namespace app
 
-#endif // SK_ENABLE_SKSL
+#endif // LAF_SKIA
