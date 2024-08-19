@@ -225,6 +225,7 @@ if(ENABLE_SCRIPTING)
     script/range_class.cpp
     script/rectangle_class.cpp
     script/require.cpp
+    script/script_input_chain.cpp
     script/security.cpp
     script/selection_class.cpp
     script/site_class.cpp
@@ -261,15 +262,12 @@ if(ENABLE_UI)
     commands/cmd_cel_properties.cpp
     commands/cmd_change_brush.cpp
     commands/cmd_change_color.cpp
-    commands/cmd_clear.cpp
     commands/cmd_clear_cel.cpp
     commands/cmd_clear_recent_files.cpp
     commands/cmd_close_file.cpp
     commands/cmd_contiguous_fill.cpp
-    commands/cmd_copy.cpp
     commands/cmd_copy_cel.cpp
     commands/cmd_copy_merged.cpp
-    commands/cmd_cut.cpp
     commands/cmd_discard_brush.cpp
     commands/cmd_duplicate_layer.cpp
     commands/cmd_duplicate_sprite.cpp
@@ -310,7 +308,6 @@ if(ENABLE_UI)
     commands/cmd_open_with_app.cpp
     commands/cmd_options.cpp
     commands/cmd_palette_editor.cpp
-    commands/cmd_paste.cpp
     commands/cmd_paste_text.cpp
     commands/cmd_pixel_perfect_mode.cpp
     commands/cmd_play_animation.cpp
@@ -418,7 +415,6 @@ if(ENABLE_UI)
     ui/home_view.cpp
     ui/icon_button.cpp
     ui/incompat_file_window.cpp
-    ui/input_chain.cpp
     ui/keyboard_shortcuts.cpp
     ui/main_menu_bar.cpp
     ui/main_window.cpp
@@ -594,8 +590,11 @@ target_sources(app-lib PRIVATE
   commands/cmd_canvas_size.cpp
   commands/cmd_cel_opacity.cpp
   commands/cmd_change_pixel_format.cpp
+  commands/cmd_clear.cpp
   commands/cmd_color_quantization.cpp
+  commands/cmd_copy.cpp
   commands/cmd_crop.cpp
+  commands/cmd_cut.cpp
   commands/cmd_deselect_mask.cpp
   commands/cmd_export_sprite_sheet.cpp
   commands/cmd_fill_and_stroke.cpp
@@ -611,6 +610,7 @@ target_sources(app-lib PRIVATE
   commands/cmd_new_layer.cpp
   commands/cmd_open_file.cpp
   commands/cmd_palette_size.cpp
+  commands/cmd_paste.cpp
   commands/cmd_remove_layer.cpp
   commands/cmd_save_file.cpp
   commands/cmd_show.cpp
@@ -701,6 +701,7 @@ target_sources(app-lib PRIVATE
   transaction.cpp
   transformation.cpp
   ui/editor/tool_loop_impl.cpp
+  ui/input_chain.cpp
   ui/layer_frame_comboboxes.cpp
   util/autocrop.cpp
   util/buffer_region.cpp

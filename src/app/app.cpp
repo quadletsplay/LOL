@@ -148,10 +148,10 @@ public:
   tools::ToolBox m_toolbox;
   tools::ActiveToolManager m_activeToolManager;
   Commands m_commands;
-#ifdef ENABLE_UI
-  RecentFiles m_recent_files;
   InputChain m_inputChain;
   Clipboard m_clipboard;
+#ifdef ENABLE_UI
+  RecentFiles m_recent_files;
 #endif
 #ifdef ENABLE_DATA_RECOVERY
   // This is a raw pointer because we want to delete it explicitly.
@@ -832,12 +832,12 @@ void App::updateDisplayTitleBar()
   title += defaultTitle;
   os::instance()->defaultWindow()->setTitle(title);
 }
+#endif
 
 InputChain& App::inputChain()
 {
   return m_modules->m_inputChain;
 }
-#endif
 
 // Updates palette and redraw the screen.
 void app_refresh_screen()

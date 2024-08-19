@@ -1,5 +1,5 @@
 // Aseprite
-// Copyright (C) 2018-2023  Igara Studio S.A.
+// Copyright (C) 2018-2024  Igara Studio S.A.
 // Copyright (C) 2001-2018  David Capello
 //
 // This program is distributed under the terms of
@@ -62,12 +62,7 @@ Preferences& Context::preferences() const
 
 Clipboard* Context::clipboard() const
 {
-#ifdef ENABLE_UI
   return Clipboard::instance();
-#else
-  // TODO support clipboard when !ENABLE_UI
-  throw std::runtime_error("Clipboard not supported");
-#endif
 }
 
 void Context::sendDocumentToTop(Doc* document)

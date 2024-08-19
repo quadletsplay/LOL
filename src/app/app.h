@@ -110,9 +110,9 @@ namespace app {
     void showNotification(INotificationDelegate* del);
     void showBackupNotification(bool state);
     void updateDisplayTitleBar();
+#endif
 
     InputChain& inputChain();
-#endif
 
 #ifdef ENABLE_SCRIPTING
     script::Engine* scriptEngine() { return m_engine.get(); }
