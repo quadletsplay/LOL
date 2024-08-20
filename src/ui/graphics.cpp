@@ -23,6 +23,8 @@
 #include "os/surface.h"
 #include "os/system.h"
 #include "os/window.h"
+#include "text/typeface.h"
+#include "text/font_style.h"
 #include "text/draw_text.h"
 #include "text/font.h"
 #include "text/font_metrics.h"
@@ -340,6 +342,8 @@ void Graphics::drawText(const std::string& str,
                         const gfx::Point& origPt,
                         text::DrawTextDelegate* delegate)
 {
+  ASSERT(!str.empty());
+
   gfx::Point pt(m_dx+origPt.x, m_dy+origPt.y);
 
   os::SurfaceLock lock(m_surface.get());
@@ -391,15 +395,37 @@ public:
   void postDrawChar(const gfx::Rect& charBounds) override {
     if (!gfx::is_transparent(m_underscoreColor)) {
       text::FontMetrics metrics;
-      float height = m_font->metrics(&metrics);
+      m_font->metrics(&metrics);
+
+      float thickness = metrics.underlineThickness;
+      if (thickness <= 0) {
+        // Compensate for fonts that don't have underline thickness available.
+        thickness = 1.0;
+      }
+
+      float underscoreY;
+      if (m_font->type() == text::FontType::Native) {
+        auto typeface = m_font->typeface();
+        if (typeface.get()) {
+          // Give the underline some extra thickness based the font weight, if it's above Normal.
+          const int weight_value =
+            (int)typeface.get()->fontStyle().weight() / 100;
+          const int weight_normal = (int)text::FontStyle::Weight::Normal / 100;
+          if (weight_value > weight_normal) {
+            thickness *= weight_value - weight_normal;
+          }
+        }
+        underscoreY = charBounds.y + charBounds.h + metrics.underlinePosition;
+      }
+      else {
+        underscoreY = charBounds.y + (-metrics.ascent + metrics.underlinePosition - metrics.underlineThickness / 2.0f);
+      }
 
       gfx::RectF underscoreBounds(
         charBounds.x,
-        charBounds.y+(-metrics.ascent
-                      +metrics.underlinePosition
-                      -metrics.underlineThickness/2.0f),
+        underscoreY,
         charBounds.w,
-        metrics.underlineThickness*guiscale());
+        thickness);
 
       os::Paint paint;
       paint.color(m_underscoreColor);
@@ -423,6 +449,8 @@ private:
 void Graphics::drawUIText(const std::string& str, gfx::Color fg, gfx::Color bg,
                           const gfx::Point& pt, const int mnemonic)
 {
+  ASSERT(!str.empty());
+
   os::SurfaceLock lock(m_surface.get());
   int x = m_dx+pt.x;
   int y = m_dy+pt.y;
@@ -451,12 +479,10 @@ gfx::Size Graphics::measureUIText(const std::string& str)
 int Graphics::measureUITextLength(const std::string& str,
                                   text::Font* font)
 {
-  DrawUITextDelegate delegate(nullptr, font, 0);
-  text::draw_text(nullptr, get_theme()->fontMgr(),
-                  base::AddRef(font), str,
-                  gfx::ColorNone, gfx::ColorNone,
-                  0, 0, &delegate);
-  return delegate.bounds().w;
+  if (str.empty())
+    return 0;
+
+  return font->textLength(str);
 }
 
 gfx::Size Graphics::fitString(const std::string& str, int maxWidth, int align)
@@ -561,7 +587,8 @@ gfx::Size Graphics::doUIStringAlgorithm(const std::string& str, gfx::Color fg, g
       else
         xout = pt.x;
 
-      drawText(line, fg, bg, gfx::Point(xout, pt.y));
+      if (!line.empty())
+        drawText(line, fg, bg, gfx::Point(xout, pt.y));
 
       if (!gfx::is_transparent(bg))
         fillAreaBetweenRects(bg,
