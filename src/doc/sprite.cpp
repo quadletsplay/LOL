@@ -36,7 +36,6 @@
 
 namespace doc {
 
-static RgbMapAlgorithm g_rgbMapAlgorithm = RgbMapAlgorithm::DEFAULT;
 static gfx::Rect g_defaultGridBounds(0, 0, 16, 16);
 
 // static
@@ -54,18 +53,6 @@ void Sprite::SetDefaultGridBounds(const gfx::Rect& defGridBounds)
     g_defaultGridBounds.w = 1;
   if (g_defaultGridBounds.h <= 0)
     g_defaultGridBounds.h = 1;
-}
-
-// static
-RgbMapAlgorithm Sprite::DefaultRgbMapAlgorithm()
-{
-  return g_rgbMapAlgorithm;
-}
-
-// static
-void Sprite::SetDefaultRgbMapAlgorithm(const RgbMapAlgorithm mapAlgo)
-{
-  g_rgbMapAlgorithm = mapAlgo;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -440,18 +427,24 @@ RgbMap* Sprite::rgbMap(const frame_t frame) const
 RgbMap* Sprite::rgbMap(const frame_t frame,
                        const RgbMapFor forLayer) const
 {
-  return rgbMap(frame,
-                forLayer,
-                g_rgbMapAlgorithm);
+  FitCriteria fc = FitCriteria::DEFAULT;
+  RgbMapAlgorithm algo = RgbMapAlgorithm::DEFAULT;
+  if (m_rgbMap) {
+    fc = m_rgbMap->fitCriteria();
+    algo = m_rgbMap->rgbmapAlgorithm();
+  }
+  return rgbMap(frame, forLayer, algo, fc);
 }
 
 RgbMap* Sprite::rgbMap(const frame_t frame,
                        const RgbMapFor forLayer,
-                       RgbMapAlgorithm mapAlgo) const
+                       const RgbMapAlgorithm mapAlgo,
+                       const FitCriteria fitCriteria) const
 {
-  if (!m_rgbMap || m_rgbMapAlgorithm != mapAlgo) {
-    m_rgbMapAlgorithm = mapAlgo;
-    switch (m_rgbMapAlgorithm) {
+  if (!m_rgbMap ||
+      m_rgbMap->rgbmapAlgorithm() != mapAlgo ||
+      m_rgbMap->fitCriteria() != fitCriteria) {
+    switch (mapAlgo) {
       case RgbMapAlgorithm::RGB5A3: m_rgbMap.reset(new RgbMapRGB5A3); break;
       case RgbMapAlgorithm::DEFAULT:
       case RgbMapAlgorithm::OCTREE: m_rgbMap.reset(new OctreeMap); break;
@@ -460,6 +453,7 @@ RgbMap* Sprite::rgbMap(const frame_t frame,
         ASSERT(false);
         return nullptr;
     }
+    m_rgbMap->fitCriteria(fitCriteria);
   }
   int maskIndex;
   if (forLayer == RgbMapFor::OpaqueLayer)
@@ -469,7 +463,7 @@ RgbMap* Sprite::rgbMap(const frame_t frame,
     if (maskIndex == -1)
       maskIndex = 0;
   }
-  m_rgbMap->regenerateMap(palette(frame), maskIndex);
+  m_rgbMap->regenerateMap(palette(frame), maskIndex, fitCriteria);
   return m_rgbMap.get();
 }
 
